@@ -3,7 +3,7 @@ name: Sync Cura Definitions
 on:
   push:
     branches:
-      - main
+      - test
   release:
     types:
       - published
@@ -13,40 +13,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout your repository
-      - name: Checkout your repository
+      # Step 1: download this repository https://github.com/fabian1606/CuraEngine-Docker.git
+      - name: Checkout
         uses: actions/checkout@v2
-
-      # Step 2: Set up Python (if needed)
-      - name: Set up Python
-        uses: actions/setup-python@v2
         with:
-          python-version: 3.8
-
-      # Step 3: Clone Cura repository
-      - name: Clone Cura repository
-        run: git clone --depth=1 https://github.com/Ultimaker/Cura.git
-
-      # Step 4: Copy definitions folder from Cura to your repository
-      - name: Copy definitions folder
-        run: cp -r Cura/resources/definitions ./printerDefinitions
-
-      # Step 5: Commit and push changes back to your repository using a secret token
-      - name: Commit and push changes
+          repository: fabian1606/CuraEngine-Docker
+          path: CuraEngine-Docker
+      # Step 2 download https://github.com/Ultimaker/Cura.git
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: Ultimaker/Cura
+          path: Cura
+      # Step 3 copy Cura/resources/definitions to CuraEngine-Docker/definitions
+      - name: Copy definitions
+        run: cp -r Cura/resources/definitions CuraEngine-Docker/definitions
+      # Step 4 commit and push changes to main using the github token
+      - name: Commit changes
         run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
-
-          # Set up Git with the personal access token stored as a secret
-          git config credential.helper 'cache --timeout=3600'
-          git config --global credential.helper "store --file=.git/credentials"
-          echo "https://github.com/${{ secrets.YOUR_GITHUB_USERNAME }}:${{ secrets.YOUR_GITHUB_TOKEN }}" > .git/credentials
-
-          # Stage changes
+          cd CuraEngine-Docker
+          git config --global user.email "
+          git config --global user.name "GitHub Actions"
           git add .
-
-          # Commit changes
-          git commit -m "Sync Cura definitions"
-
-          # Push changes to the main branch using the secret token
+          git commit -m "Sync definitions"
           git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
