@@ -3,7 +3,7 @@ name: Sync Cura Definitions
 on:
   push:
     branches:
-      - test
+      - main
   release:
     types:
       - published
