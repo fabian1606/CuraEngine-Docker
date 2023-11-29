@@ -1,0 +1,52 @@
+name: Sync Cura Definitions
+
+on:
+  push:
+    tags:
+      - "run-action-*"
+  release:
+    types:
+      - published
+
+jobs:
+  syncDefinitions:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout your repository
+      - name: Checkout your repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Python (if needed)
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      # Step 3: Clone Cura repository
+      - name: Clone Cura repository
+        run: git clone --depth=1 https://github.com/Ultimaker/Cura.git
+
+      # Step 4: Copy definitions folder from Cura to your repository
+      - name: Copy definitions folder
+        run: cp -r Cura/resources/definitions ./printerDefinitions
+
+      # Step 5: Commit and push changes back to your repository using a secret token
+      - name: Commit and push changes
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+
+          # Set up Git with the personal access token stored as a secret
+          git config credential.helper 'cache --timeout=3600'
+          git config --global credential.helper "store --file=.git/credentials"
+          echo "https://github.com/${{ secrets.YOUR_GITHUB_USERNAME }}:${{ secrets.YOUR_GITHUB_TOKEN }}" > .git/credentials
+
+          # Stage changes
+          git add .
+
+          # Commit changes
+          git commit -m "Sync Cura definitions"
+
+          # Push changes to the main branch using the secret token
+          git push origin main
