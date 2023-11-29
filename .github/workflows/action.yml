@@ -2,8 +2,8 @@ name: Sync Cura Definitions
 
 on:
   push:
-    tags:
-      - "run-action-*"
+    branches:
+      - main
   release:
     types:
       - published
