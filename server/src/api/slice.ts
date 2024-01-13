@@ -27,9 +27,9 @@ const sliceModel = (
   printer_def: string = "../../../printerDefinitions/ultimaker3.def.json" as string,
 ): Promise<void | Error> => {
   return new Promise<void | Error>(
-    (resolve: (result: void) => void, reject: (error: Error) => void): void => {
+    (resolve: (result: void) => void, _reject: (error: Error) => void): void => {
       if (!isStlFileValid(filePath)) {
-        reject(new Error("Invalid STL file"));
+        // reject(new Error("Invalid STL file"));
       }
       const outputPath = `${APP_DIR}/outputs/${filePath.split(".")[0]}.gcode`;
       console.log(outputPath);
