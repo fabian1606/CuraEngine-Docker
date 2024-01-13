@@ -1,4 +1,7 @@
 .DS_store
 server/node_modules
+server/yarn.lock
 printerDefinitions
 server/uploads
+server/.env
+server/build

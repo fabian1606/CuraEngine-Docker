@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "rootDir": "src",
+    "allowJs": false,
+    "sourceMap": true,
+    "outDir": "./build",
+    "importHelpers": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+  },
+  "types": ["src/types/*.d.ts"],
+  "include": [
+    "src/**/*.ts",
+    "src/types/*.d.ts",
+    // other paths...
+  ]
+}
