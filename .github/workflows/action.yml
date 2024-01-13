@@ -1,0 +1,41 @@
+name: Sync Cura Definitions
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+jobs:
+  syncDefinitions:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: download this repository https://github.com/fabian1606/CuraEngine-Docker.git
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: fabian1606/CuraEngine-Docker
+          path: CuraEngine-Docker
+      # Step 2 download https://github.com/Ultimaker/Cura.git
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: Ultimaker/Cura
+          path: Cura
+      # Step 3 copy Cura/resources/definitions to CuraEngine-Docker/definitions
+      - name: Copy definitions
+        run: cp -r Cura/resources/definitions CuraEngine-Docker/definitions
+      # Step 4 commit and push changes to main using the github token
+      - name: Commit changes
+        run: |
+          cd CuraEngine-Docker
+          git config --global user.email "nikiphi01@gmail.com"
+          git config --global user.name "GitHub Actions"
+          git add .
+          git commit -m "Sync definitions"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

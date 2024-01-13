@@ -1,0 +1,5 @@
+.DS_store
+server/node_modules
+printerDefinitions
+server/uploads
+server/outputs

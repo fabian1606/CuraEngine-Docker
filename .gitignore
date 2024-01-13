@@ -3,5 +3,6 @@ server/node_modules
 server/yarn.lock
 printerDefinitions
 server/uploads
+server/outputs
 server/.env
 server/build
