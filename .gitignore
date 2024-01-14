@@ -1,8 +1,9 @@
 .DS_store
 server/node_modules
 server/yarn.lock
-printerDefinitions
-server/uploads
-server/outputs
+/printerDefinitions
+server/uploads/*
+server/outputs/*
+server/printerDefinitions/*
 server/.env
 server/build

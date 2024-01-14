@@ -12,47 +12,49 @@ const router: Router = Router();
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
-    const uploadDir = path.join(APP_DIR, '../uploads');
+    const uploadDir= path.join(APP_DIR, '../uploads');
     console.log(uploadDir);
-    
-    
-    fs.mkdirSync(uploadDir, { recursive: true }); // Erstelle den Ordner rekursiv, falls er nicht existiert
-    
+    // only create the directory if it doesn't exist
+    fs.mkdirSync(uploadDir, { recursive: true });
+
     cb(null, uploadDir);
   },
-  filename: (_req, _file, cb) => {
+  filename: (_req, file, cb) => {
     const uuid = uuidv4();
-    cb(null, uuid+".stl"); // Verwende den Originalnamen der Datei
+    const extension = path.extname(file.originalname);
+    cb(null, uuid + extension);
   },
 });
 
 const upload = multer({ storage: storage });
 
-router.post('/', isAuthed, upload.single("file"), (req: Request, res: Response): void => {
-  if (!req.file) {
-    res.status(400).send('No files were uploaded.');
+router.post('/', isAuthed, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'printerDefinition', maxCount: 1 }]), (req: Request, res: Response): void => {
+  const modelFile:Express.Multer.File = (req.files as Record<string, Express.Multer.File[]>).file?.[0];
+  const printerDefinitionFile:Express.Multer.File = (req.files as Record<string, Express.Multer.File[]>).printerDefinition?.[0];
+
+  if (!modelFile || !printerDefinitionFile) {
+    res.status(400).send('Both model file and printer definition file are required.');
   } else {
-    console.log(path.join(req.file.destination, req.file!.filename.split(".")[0] + '.gcode'));
-    const slicedFilePath = path.join(APP_DIR, '/../outputs', req.file!.filename.split(".")[0] + '.gcode');
-    sliceModel(req.file.filename, req.body.printer)
+    const slicedFilePath: string = path.join(APP_DIR, '/../outputs', modelFile.filename.split(".")[0] + '.gcode');
+    sliceModel(modelFile.filename, printerDefinitionFile.filename)
       .then(() => {
         console.log(slicedFilePath);
-        
+
         res.download(slicedFilePath, (err: Error) => {
           if (err) {
             console.error(err);
             res.status(500).send(err.message);
           } else {
-            console.log("slice successfull");
-            deleteFiles(req.file!.path, slicedFilePath);
+            console.log("Slice successful");
+            deleteFiles(modelFile.path,printerDefinitionFile.path, slicedFilePath);
           }
         });
       })
       .catch((err: Error) => {
         console.error(err);
         res.status(500).send(err.message);
-        deleteFiles(req.file!.path,null);
-      })
+        // deleteFiles(modelFile.path,printerDefinitionFile.path, slicedFilePath);
+      });
   }
 });
 
